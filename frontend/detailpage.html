@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CVE Details</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 20px auto;
+            background-color: white;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .severity-info {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        .scores-info{
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>CVE Details</h1>
+        <div id="cveDetailsContainer">
+            <div class="cve-info">
+                <h2 id="cveId">CVE-XXXX-XXXX</h2>
+                <div id="description"></div>
+            </div>
+
+            <div class="cvss-metrics">
+                <h3>CVSS V2 Metrics :</h3>
+                <div class="severity-info">
+                    <div>
+                        <strong>Severity:</strong> <span id="severityLevel"></span>
+                    </div>
+                    <div>
+                        <strong>Score:</strong> <span id="baseScore"></span>
+                    </div>
+                    <div>
+                        <strong>Vector String:</strong> <span id="vectorString"></span>
+                    </div>
+                </div>
+                <table id="horizontalMetricsTable">
+                    <thead>
+                        <tr>
+                            <th>Access Vector</th>
+                            <th>Access Complexity</th>
+                            <th>Authentication</th>
+                            <th>Confidentiality Impact</th>
+                            <th>Integrity Impact</th>
+                            <th>Availability Impact</th>
+                        </tr>
+                    </thead>
+                    <tbody id="horizontalMetricsBody">
+                    </tbody>
+                </table>
+            </div>
+            <div class="scores-info">
+                <h3>Scores :</h3>
+                <div>
+                    <strong>Exploitablilty Score:</strong> <span id="exploitability_score"></span>
+                </div>
+                <div>
+                    <strong>Impact Score:</strong> <span id="impact_score"></span>
+                </div>
+
+            </div>
+            <div class="cpe-info">
+                <h3>CPE :</h3>
+                <table id="cpeTable">
+                    <thead>
+                        <tr>
+                            <th>Criteria</th>
+                            <th>Match Criteria ID</th>
+                            <th>Vulnerable</th>
+                        </tr>
+                    </thead>
+                    <tbody id="cpeTableBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <button onclick="window.location.href='/cves/list'">Back to List</button>
+    </div>
+
+    <script>
+document.addEventListener('DOMContentLoaded', () => {
+    const pathParts = window.location.pathname.split('/');
+    const cveId = pathParts[pathParts.length - 1];
+
+    const cveIdElement = document.getElementById('cveId');
+    const descriptionElement = document.getElementById('description');
+    const severityLevelElement = document.getElementById('severityLevel');
+    const baseScoreElement = document.getElementById('baseScore');
+    const vectorStringElement = document.getElementById('vectorString');
+    const horizontalMetricsBody = document.getElementById('horizontalMetricsBody');
+    const cpeTableBody = document.getElementById('cpeTableBody');
+    const exploitabilityScoreElement = document.getElementById('exploitability_score');
+    const impactScoreElement = document.getElementById('impact_score');
+
+    function determineSeverityLevel(score) {
+        if (score >= 7.0) return 'High';
+        if (score >= 4.0) return 'Medium';
+        return 'Low';
+    }
+
+    function formatScore(score) {
+        // Check if score is a number and not NaN
+        if (typeof score === 'number' && !isNaN(score)) {
+            return score.toFixed(1);
+        }
+        return 'N/A';
+    }
+
+    async function fetchCVEDetails() {
+        try {
+            const response = await fetch(`/api/cves/${cveId}`);
+            const data = await response.json();
+
+            cveIdElement.textContent = cveId;
+
+            const descriptions = data.descriptions || [];
+            const englishDesc = descriptions.find(desc => desc.lang === 'en') || descriptions[0];
+            descriptionElement.innerHTML = `<strong>Description:</strong> ${englishDesc ? englishDesc.value : 'No description available'}`;
+
+            const metrics = data.metrics || [];
+            if (metrics.length > 0) {
+                const metricData = metrics[0].cvss_data;
+
+                const baseScore = metricData.base_score;
+                baseScoreElement.textContent = baseScore;
+                severityLevelElement.textContent = determineSeverityLevel(baseScore);
+                vectorStringElement.textContent = metricData.vector_string;
+
+                let exploitabilityScore = data.exploitability_score;
+                let impactScore = data.impact_score;
+
+                if (exploitabilityScore === undefined && metrics[0].exploitability_score !== undefined) {
+                    exploitabilityScore = metrics[0].exploitability_score;
+                }
+                if (impactScore === undefined && metrics[0].impact_score !== undefined) {
+                    impactScore = metrics[0].impact_score;
+                }
+
+                exploitabilityScoreElement.textContent = formatScore(exploitabilityScore);
+                impactScoreElement.textContent = formatScore(impactScore);
+
+                const metricsRow = document.createElement('tr');
+                metricsRow.innerHTML = `
+                    <td>${metricData.access_vector}</td>
+                    <td>${metricData.access_complexity}</td>
+                    <td>${metricData.authentication}</td>
+                    <td>${metricData.confidentiality_impact}</td>
+                    <td>${metricData.integrity_impact}</td>
+                    <td>${metricData.availability_impact}</td>
+                `;
+                horizontalMetricsBody.appendChild(metricsRow);
+            }
+
+            const cpeData = data.cpe || [];
+            cpeTableBody.innerHTML = '';
+            cpeData.forEach((cpe, index) => {
+                cpe.cpe_matches.forEach(match => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${match.criteria}</td>
+                        <td>${match.match_criteria_id}</td>
+                        <td>${match.vulnerable ? 'Yes' : 'No'}</td>
+                    `;
+                    cpeTableBody.appendChild(row);
+                });
+            });
+        } catch (error) {
+            console.error('Error fetching CVE details:', error);
+            descriptionElement.textContent = 'Error loading CVE details';
+            exploitabilityScoreElement.textContent = 'Error';
+            impactScoreElement.textContent = 'Error';
+        }
+    }
+
+    fetchCVEDetails();
+});
+    </script>
+</body>
+</html>

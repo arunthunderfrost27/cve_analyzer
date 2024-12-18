@@ -1,0 +1,10 @@
+[2024-12-18 09:50:46] STARTUP: CVE Synchronization Process Initiated
+[2024-12-18 09:50:46] DATABASE: Initiating MongoDB connection
+[2024-12-18 09:50:47] DATABASE: MongoDB connection established successfully
+[2024-12-18 09:50:47] PROCESS: Fetching latest CVE data
+[2024-12-18 09:50:47] FETCH: Initiating CVE data retrieval
+[2024-12-18 09:51:06] FETCH: Successfully retrieved CVE data. Status code: 200
+[2024-12-18 09:51:06] PROCESS: Processing CVE data
+[2024-12-18 09:51:06] PROCESS: Starting CVE data processing
+[2024-12-18 09:54:11] SUMMARY: Processed 2000 CVE entries. New: 0, Updated: 0
+[2024-12-18 09:54:11] SHUTDOWN: MongoDB connection closed
