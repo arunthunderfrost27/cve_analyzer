@@ -1,5 +1,4 @@
 Clone the Repository using [https://github.com/arunthunderfrost27/cve_analyzer.git]
-(https://github.com/arunthunderfrost27/cve_analyzer.git)
 
 To run the Application
 
