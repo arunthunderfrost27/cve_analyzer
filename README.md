@@ -5,9 +5,14 @@ To run the Application
 cd backend
 
 python process.py -> select any port =>To start the Flask App and the homepage.
-python web_sync.py => To fetch the data from web json url and compare every record with the existing database records to find the unique and replace.
+
+python web_sync.py => To fetch the data from web json url and 
+compare every record with the existing database records to find the unique and replace.
+
 python autosync.py => To run the manual synchronization and initiate the windows task scheduler to autoupdate.
-python file_sync.py => To run the database updation based on the downloaded json file and compare every record with the existing database records to find the unique and replace.
+
+python file_sync.py => To run the database updation based on the downloaded json file and
+compare every record with the existing database records to find the unique and replace.
 
 python database.py => To drop all the collections and replace the database
 
@@ -51,7 +56,9 @@ To check the test cases modify the json file in data folder and run python file_
 
 1.Case 1 -> Fetching the cve details by cve id
 
-Input : click on cve-id : CVE-2000-0302 row -> GET /api/cves/CVE-2000-0302 -> To fetch the details of cve record based on cve id
+Input : click on cve-id : CVE-2000-0302 row -> GET /api/cves/CVE-2000-0302 -> 
+To fetch the details of cve record based on cve id
+
 Expected Output : make reference from sample-detailpage.png attached in the git repository
 
 2.Case 2 -> Updating the identifier in existing cve record
@@ -64,13 +71,15 @@ Published Date : 31 May 1999
 Last Modified Date : 20 Nov 2024
 Status : Modified
 
-expected output :MongoDB initiated
+expected output :
+
+MongoDB initiated
 Processed 2000 CVE Entries
 updated 1 entries of the database
 
 
 Cve Id : CVE-1999-1485
-Identifier : cvedata@mitre.org
+Identifier : cve2@mitre.org
 Published Date : 31 May 1999
 Last Modified Date : 18 Dec 2024[Updated date]
 Status : Modified
@@ -85,7 +94,9 @@ Published Date : 31 Mar 2000
 Last Modified Date : 20 Nov 2024
 Status : Modified
 
-Expected output : MongoDB initiated
+Expected output : 
+
+MongoDB initiated
 Processed 1999 CVE Entries[excluding the deleted record]
 i entries has been deleted
 
@@ -97,7 +108,9 @@ Published Date : 31 Mar 2000
 Last Modified Date : 15 Dec 2024[Updated date]
 Status : Modified
 
-Expected output : MongoDB initiated
+Expected output : 
+
+MongoDB initiated
 Loaded 2001 CVE Entries into mongodb[including the deleted record]
 
 
